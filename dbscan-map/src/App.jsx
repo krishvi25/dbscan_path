@@ -61,6 +61,8 @@ const [suggestions, setSuggestions] = useState([]);
   const eps = 80 / 111000;
   const minPts = 3;
 const debounceRef = useRef(null);
+const [searchLoading, setSearchLoading] = useState(false);
+const [showPanel, setShowPanel] = useState(true);
   /* ---------------- HELPERS ---------------- */
 
   function clusterColor(size) {
@@ -82,14 +84,19 @@ async function searchPlace(query) {
   }
 
   try {
+    setSearchLoading(true);
+
     const res = await fetch(
-  `http://localhost:5000/search?q=${encodeURIComponent(query)}`
-);
+      `http://localhost:5000/search?q=${encodeURIComponent(query)}`
+    );
 
     const data = await res.json();
     setSuggestions(data);
+
   } catch (err) {
     console.log("Search error:", err);
+  } finally {
+    setSearchLoading(false);
   }
 }
   /* ---------------- VOICE ---------------- */
@@ -315,26 +322,46 @@ function calculateRouteSeverity(routeCoords) {
         </div>
       )}
 
-      <div className="glass-panel">
-        <h2>🚘 Smart Navigator</h2>
+      {showPanel && (
+  <div className="glass-panel">
+
+    <div style={{
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center"
+    }}>
+      <h3 style={{ margin: 0 }}>🚘 Smart Navigator</h3>
+
+      <button
+        onClick={() => setShowPanel(false)}
+        style={{
+          background: "transparent",
+          border: "none",
+          fontSize: "18px",
+          cursor: "pointer"
+        }}
+      >
+        ❌
+      </button>
+    </div>
+       
 
         
-        {userLocation && (
-  <>
-    <input
-      type="text"
-      placeholder="🔍 Search destination..."
-      value={searchText}
-      onChange={(e) => {
-        const value = e.target.value;
-        setSearchText(value);
+        <>
+  <input
+    type="text"
+    placeholder="🔍 Search destination..."
+    value={searchText}
+    onChange={(e) => {
+      const value = e.target.value;
+      setSearchText(value);
 
-        clearTimeout(debounceRef.current);
-        debounceRef.current = setTimeout(() => {
-          searchPlace(value);
-        }, 700);
-      }}
-    />
+      clearTimeout(debounceRef.current);
+      debounceRef.current = setTimeout(() => {
+        searchPlace(value);
+      }, 300);
+    }}
+  />
 
     {suggestions.length > 0 && (
       <div
@@ -371,43 +398,10 @@ function calculateRouteSeverity(routeCoords) {
     {place.display_name}
   </div>
 ))}
-      </div>
+      </div> 
     )}
   </>
-)}
-{suggestions.length > 0 && (
-  <div
-    style={{
-      background: "white",
-      maxHeight: "200px",
-      overflowY: "auto",
-      borderRadius: "6px",
-      marginTop: "5px",
-      boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
-    }}
-  >
-    {suggestions.map((place, index) => (
-      <div
-        key={index}
-        onClick={() => {
-          setDestination([
-            parseFloat(place.lat),
-            parseFloat(place.lon),
-          ]);
-          setSearchText(place.display_name);
-          setSuggestions([]);
-        }}
-        style={{
-          padding: "8px",
-          cursor: "pointer",
-          borderBottom: "1px solid #eee",
-        }}
-      >
-        {place.display_name}
-      </div>
-    ))}
-  </div>
-)}
+
 
         {userLocation && destination && routeOptions.length === 0 && (
           <button onClick={showRoutes}>🗺 Show Routes</button>
@@ -444,7 +438,7 @@ function calculateRouteSeverity(routeCoords) {
         {selectedRoute && !journeyStarted && (
           <button onClick={startJourney}>🚀 Start Journey</button>
         )}
-      </div>
+      </div> )}
 
     
         <MapContainer
@@ -452,6 +446,29 @@ function calculateRouteSeverity(routeCoords) {
         zoom={13}
         style={{ height: "100%", width: "100%" }}
       >
+        {!showPanel && (
+  <button
+  onClick={() => setShowPanel(true)}
+  style={{
+    position: "absolute",
+    top: 20,
+    left: 20,
+    zIndex: 3000,
+    padding: "10px 14px",
+    borderRadius: "10px",
+    border: "1px solid rgba(0,0,0,0.1)",
+    background: "rgba(0, 0, 0, 0.75)",
+    color: "#fff",
+    fontWeight: "500",
+    fontSize: "14px",
+    backdropFilter: "blur(6px)",
+    cursor: "pointer",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.25)"
+  }}
+>
+  ☰ Menu
+</button>
+)}
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
         
