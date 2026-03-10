@@ -45,6 +45,7 @@ function MapClickHandler({ onSelect, enabled }) {
 /* ---------------- APP ---------------- */
 
 export default function App() {
+  const [selectedCluster, setSelectedCluster] = useState(null);
   const [points, setPoints] = useState([]);
   const [userLocation, setUserLocation] = useState(null);
   const [destination, setDestination] = useState(null);
@@ -60,6 +61,24 @@ const [searchText, setSearchText] = useState("");
 const [suggestions, setSuggestions] = useState([]);
   const eps = 80 / 111000;
   const minPts = 3;
+  // ---------------- DBSCAN CLUSTERS ----------------
+
+const clusters = {};
+
+if (points.length > 0) {
+  const clustered = dbscan(points, eps, minPts);
+
+  clustered.forEach((p) => {
+    if (p.cluster !== -1) {
+      if (!clusters[p.cluster]) {
+        clusters[p.cluster] = [];
+      }
+      clusters[p.cluster].push(p);
+    }
+  });
+}
+console.log("POINT COUNT:", points.length);
+console.log("CLUSTERS:", clusters);
 const debounceRef = useRef(null);
 const [searchLoading, setSearchLoading] = useState(false);
 const [showPanel, setShowPanel] = useState(true);
@@ -127,32 +146,40 @@ async function searchPlace(query) {
 
   /* ---------------- LOAD CSV ---------------- */
 
+  
+  // fetch("http://localhost:5000/points")
+  //   .then(res => res.json())
+  //   .then(data => {
+
+  //     const points = data.map(p => ({
+  //       lat: p.lat,
+  //       lng: p.lng
+  //     }));
+
+  //     setPoints(points);   // ✅ ONLY STORE POINTS
+
+  //   })
+  //   .catch(err => console.error(err));
+
   useEffect(() => {
-    Papa.parse("/locations.csv", {
-      download: true,
-      header: true,
-      complete: (res) => {
-        const clean = res.data
-          .map((r) => ({
-            lat: parseFloat(r.lat),
-            lng: parseFloat(r.lng),
-          }))
-          .filter((p) => !isNaN(p.lat) && !isNaN(p.lng));
+  fetch("http://localhost:5000/Points")
+    .then(res => res.json())
+    .then(data => {
 
-        setPoints(clean);
-      },
-    });
-  }, []);
+      console.log("DATA FROM DB:", data);   // 👈 ADD THIS
 
-  const clustered = dbscan(points, eps, minPts);
-  const clusters = {};
+     const points = data.map(p => ({
+  lat: Number(p.Latitude),
+  lng: Number(p.Longitude)
+}));
+console.log("DATA FROM DB:", data);
+      console.log("POINTS:", points);   // 👈 ADD THIS
 
-  clustered.forEach((p) => {
-    if (p.cluster !== -1) {
-      clusters[p.cluster] ??= [];
-      clusters[p.cluster].push(p);
-    }
-  });
+      setPoints(points);
+
+    })
+    .catch(err => console.error(err));
+}, []);
 
   /* ---------------- LOCATION ---------------- */
 
@@ -197,6 +224,7 @@ function calculateRouteSeverity(routeCoords) {
 
   routeCoords.forEach(([lat, lng]) => {
     const point = turf.point([lng, lat]);
+
 
     for (const pts of Object.values(clusters)) {
       const hull = turf.convex(
@@ -502,17 +530,29 @@ function calculateRouteSeverity(routeCoords) {
           const color = clusterColor(pts.length);
 
           return (
-            <Polygon
-              key={id}
-              positions={coords}
-              pathOptions={{
-                color,
-                fillColor: color,
-                fillOpacity: 0.3,
-              }}
-            />
+           <Polygon
+  key={id}
+  positions={coords}
+  pathOptions={{
+    color,
+    fillColor: color,
+    fillOpacity: 0.3,
+  }}
+  eventHandlers={{
+    click: () => setSelectedCluster(pts)
+  }}
+/>
+
           );
-        })}
+        })}{selectedCluster &&
+  selectedCluster.map((p, i) => (
+    <Marker
+      key={i}
+      position={[p.lat, p.lng]}
+      icon={pinIcon("red")}
+    />
+  ))
+}
 
         {routeOptions.map((r) => (
           <Polyline
