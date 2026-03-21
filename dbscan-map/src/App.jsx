@@ -161,7 +161,7 @@ async function searchPlace(query) {
   //   })
   //   .catch(err => console.error(err));
 
-  useEffect(() => {
+/*  useEffect(() => {
   fetch("http://localhost:5000/Points")
     .then(res => res.json())
     .then(data => {
@@ -177,8 +177,18 @@ console.log("DATA FROM DB:", data);
 
       setPoints(points);
 
+    })*/
+    useEffect(() => {
+  fetch("http://localhost:5000/Points")
+    .then(res => res.json())
+    .then(data => {
+      const validPoints = data
+        .filter(p => !isNaN(p.Latitude) && !isNaN(p.Longitude))
+        .map(p => ({ lat: Number(p.Latitude), lng: Number(p.Longitude) }));
+      console.log("POINTS LOADED:", validPoints.length);
+      setPoints(validPoints);
     })
-    .catch(err => console.error(err));
+    .catch(err => console.error("Fetch points error:", err));
 }, []);
 
   /* ---------------- LOCATION ---------------- */
