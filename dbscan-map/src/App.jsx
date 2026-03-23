@@ -179,7 +179,7 @@ console.log("DATA FROM DB:", data);
 
     })*/
     useEffect(() => {
- // fetch("http://localhost:5000/Points")
+// fetch("http://localhost:5000/Points")
   fetch("https://dbscan-path.onrender.com")
     .then(res => res.json())
     .then(data => {
