@@ -19,14 +19,15 @@ collection = db["Points"]
 
 
 
-df = pd.read_excel("2023-Colvale-Final.xlsx", header=1)
+#df = pd.read_excel("2023-Colvale-Final.xlsx", header=1)
 #df = pd.read_excel("2023-Porvorim-Final.xlsx", header=1)
-#df = pd.read_excel("2023-Anjuna-Final.xlsx", header=1)
+#df = pd.read_excel("2023-Anjuna-Final.xlsx", header=1)//lat not there
+
 #df = pd.read_excel("2024-Anjuna-Final.xlsx", header=1)
 #df = pd.read_excel("2024-Colvale-Final.xlsx", header=1)
 #df = pd.read_excel("2024-Mapusa-Final.xlsx", header=1)
 #df = pd.read_excel("2024-Panaji-Final.xlsx", header=1)
-#df = pd.read_excel("2024-Porvorim-Final.xlsx", header=1)
+df = pd.read_excel("2024-Porvorim-Final.xlsx", header=1)
 
 # -----------------------------
 # Clean Column Names Properly
