@@ -107,6 +107,7 @@ async function searchPlace(query) {
 
     const res = await fetch(
       `https://dbscan-path.onrender.com/search?q=${encodeURIComponent(query)}`
+      
     );
 
     const data = await res.json();
@@ -179,8 +180,8 @@ console.log("DATA FROM DB:", data);
 
     })*/
     useEffect(() => {
-// fetch("http://localhost:5000/Points")
- fetch("https://dbscan-path.onrender.com/Points")
+ fetch("http://localhost:5000/Points")
+ //fetch("https://dbscan-path.onrender.com")
     .then(res => res.json())
     .then(data => {
       const validPoints = data

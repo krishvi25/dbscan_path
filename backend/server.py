@@ -7,12 +7,18 @@ app = Flask(__name__)
 CORS(app)  # allow React frontend requests
 
 # ---------------- MongoDB Connection ----------------
-client = MongoClient("mongodb://127.0.0.1:27017/")
+import os
+from pymongo import MongoClient
+
+MONGO_URI = os.environ.get("MONGO_URI")
+
+if MONGO_URI:
+    client = MongoClient(MONGO_URI)  # Render
+else:
+    client = MongoClient("mongodb+srv://krishvi:krishvik@m0.fayormx.mongodb.net/mapDB")  # Local
+
 db = client["mapDB"]
 points_collection = db["Points"]
-
-print("MongoDB connected")
-
 # ---------------- Get Points ----------------
 @app.route("/Points", methods=["GET"])
 def get_points():

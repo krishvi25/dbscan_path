@@ -4,7 +4,10 @@ from pymongo import MongoClient
 # -----------------------------
 # MongoDB Connection
 # -----------------------------
-client = MongoClient("mongodb://localhost:27017/")
+
+MONGO_URI = "mongodb+srv://krishvi:krishvik@m0.fayormx.mongodb.net/?appName=M0"
+
+client = MongoClient(MONGO_URI, tls=True)
 db = client["mapDB"]
 collection = db["Points"]
 
@@ -12,12 +15,18 @@ collection = db["Points"]
 # Read Excel File
 # -----------------------------
 #df = pd.read_excel("2023-Panaji-Final.xlsx", header=1)
-#df = pd.read_excel("2023-Mapusa-Final.xlsx", header=1)
-#df = pd.read_excel("2023-Colvale-Final.xlsx", header=1)
+#df = pd.read_excel("2023-Mapusa-Final.xlsx", header=1) //done till here 
 
+
+
+#df = pd.read_excel("2023-Colvale-Final.xlsx", header=1)
 #df = pd.read_excel("2023-Porvorim-Final.xlsx", header=1)
 #df = pd.read_excel("2023-Anjuna-Final.xlsx", header=1)
-
+#df = pd.read_excel("2024-Anjuna-Final.xlsx", header=1)
+#df = pd.read_excel("2024-Colvale-Final.xlsx", header=1)
+#df = pd.read_excel("2024-Mapusa-Final.xlsx", header=1)
+#df = pd.read_excel("2024-Panaji-Final.xlsx", header=1)
+#df = pd.read_excel("2024-Porvorim-Final.xlsx", header=1)
 
 # -----------------------------
 # Clean Column Names Properly
