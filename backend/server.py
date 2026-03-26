@@ -57,18 +57,42 @@ def get_points():
 @app.route("/search", methods=["GET"])
 def search():
     q = request.args.get("q")
+
     if not q:
         return jsonify([])
 
     try:
-        url = f"https://nominatim.openstreetmap.org/search?format=json&q={q}&limit=5"
-        headers = {"User-Agent": "smart-navigator-app"}
-        response = requests.get(url, headers=headers)
-        data = response.json()
-        return jsonify(data)
+        url = "https://nominatim.openstreetmap.org/search"
+
+        params = {
+            "q": q,
+            "format": "json",
+            "limit": 5
+        }
+
+        headers = {
+            "User-Agent": "KrishviNavigatorApp/1.0 (krishvi@email.com)"
+        }
+
+        response = requests.get(
+            url,
+            params=params,
+            headers=headers,
+            timeout=10
+        )
+
+        # 👇 DEBUG THIS
+        print("STATUS:", response.status_code)
+        print("RESPONSE:", response.text[:200])
+
+        if response.status_code != 200:
+            return jsonify([])
+
+        return jsonify(response.json())
+
     except Exception as e:
-        print("Search failed:", e)
-        return jsonify({"error": "Search failed"}), 500
+        print("🔥 ERROR:", e)
+        return jsonify([])
 
 # ---------------- Run Server ----------------
 @app.route("/")
