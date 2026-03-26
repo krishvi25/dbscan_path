@@ -62,38 +62,27 @@ def search():
         return jsonify([])
 
     try:
-        url = "https://nominatim.openstreetmap.org/search"
-
-        params = {
-            "q": q,
-            "format": "json",
-            "limit": 5
-        }
+        url = f"https://nominatim.openstreetmap.org/search?q={q}&format=json&limit=5"
 
         headers = {
-            "User-Agent": "KrishviNavigatorApp/1.0 (krishvi@email.com)"
+            "User-Agent": "KrishviNavigator/1.0 (krishvi@gmail.com)"
         }
 
-        response = requests.get(
-            url,
-            params=params,
-            headers=headers,
-            timeout=10
-        )
+        response = requests.get(url, headers=headers, timeout=10)
 
-        # 👇 DEBUG THIS
         print("STATUS:", response.status_code)
-        print("RESPONSE:", response.text[:200])
+        print("DATA:", response.text[:200])
 
         if response.status_code != 200:
             return jsonify([])
 
-        return jsonify(response.json())
+        data = response.json()
+
+        return jsonify(data)
 
     except Exception as e:
-        print("🔥 ERROR:", e)
+        print("ERROR:", e)
         return jsonify([])
-
 # ---------------- Run Server ----------------
 @app.route("/")
 def home():
