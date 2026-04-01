@@ -13,6 +13,7 @@ import * as turf from "@turf/turf";
 import { dbscan } from "./dbscan";
 import "leaflet/dist/leaflet.css";
 import "./leafletFix";
+import { Popup } from "react-leaflet";
 
 /* ---------------- ICON ---------------- */
 
@@ -79,6 +80,7 @@ if (points.length > 0) {
 }
 console.log("POINT COUNT:", points.length);
 console.log("CLUSTERS:", clusters);
+
 const debounceRef = useRef(null);
 const [searchLoading, setSearchLoading] = useState(false);
 const [showPanel, setShowPanel] = useState(true);
@@ -186,13 +188,29 @@ console.log("DATA FROM DB:", data);
     .then(data => {
       const validPoints = data
         .filter(p => !isNaN(p.Latitude) && !isNaN(p.Longitude))
-        .map(p => ({ lat: Number(p.Latitude), lng: Number(p.Longitude) }));
+        .map(p => ({ lat: Number(p.Latitude), lng: Number(p.Longitude),
+  cause: p.Cause || "Others" }));
       console.log("POINTS LOADED:", validPoints.length);
       setPoints(validPoints);
     })
     .catch(err => console.error("Fetch points error:", err));
 }, []);
+/*cluster cause*/ 
+function getClusterCauseStats(clusterPoints) {
+  const freq = {};
 
+  clusterPoints.forEach(p => {
+    const cause = p.cause || "Others";
+    freq[cause] = (freq[cause] || 0) + 1;
+  });
+
+  const sorted = Object.entries(freq).sort((a, b) => b[1] - a[1]);
+
+  return {
+    top: sorted[0]?.[0] || "Others",
+    all: sorted
+  };
+}
   /* ---------------- LOCATION ---------------- */
 
   function getMyLocation() {
@@ -550,21 +568,52 @@ function calculateRouteSeverity(routeCoords) {
     fillColor: color,
     fillOpacity: 0.3,
   }}
+  
   eventHandlers={{
-    click: () => setSelectedCluster(pts)
+   click: () => {
+  setSelectedCluster({
+    points: pts,
+    stats: getClusterCauseStats(pts)
+  });
+}
+
+  
   }}
 />
 
           );
-        })}{selectedCluster &&
-  selectedCluster.map((p, i) => (
-    <Marker
-      key={i}
-      position={[p.lat, p.lng]}
-      icon={pinIcon("red")}
-    />
-  ))
-}
+        })}{selectedCluster && (
+  <>
+    {/* 🔴 Show all points */}
+    {selectedCluster.points.map((p, i) => (
+      <Marker
+        key={i}
+        position={[p.lat, p.lng]}
+        icon={pinIcon("red")}
+      />
+    ))}
+
+    {/* 📍 Popup */}
+    <Popup
+      position={[
+        selectedCluster.points[0].lat,
+        selectedCluster.points[0].lng
+      ]}
+    >
+      <div style={{ minWidth: "180px" }}>
+        <h4 style={{ margin: "0 0 5px 0" }}>🚨 Accident Zone</h4>
+
+        <p><b>Top Cause:</b> {selectedCluster.stats.top}</p>
+
+        <ul style={{ paddingLeft: "18px", margin: 0 }}>
+          {selectedCluster.stats.all.slice(0, 3).map(([c, n], i) => (
+            <li key={i}>{c}: {n}</li>
+          ))}
+        </ul>
+      </div>
+    </Popup>
+  </>
+)}
 
         {routeOptions.map((r) => (
           <Polyline

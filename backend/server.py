@@ -45,10 +45,12 @@ def get_points():
         if str(lat) == "nan" or str(lng) == "nan":
             continue
 
+     
         valid_points.append({
-            "Latitude": lat,
-            "Longitude": lng
-        })
+    "Latitude": lat,
+    "Longitude": lng,
+    "Cause": p.get("Cause")
+})
 
     print("Valid points:", len(valid_points))
 

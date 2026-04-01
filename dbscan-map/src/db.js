@@ -3,7 +3,7 @@ export function dbscan(points, eps, minPts) {
   const visited = new Set();
 
   function distance(a, b) {
-    const dx = a.lat - b.lat;
+    const dx = a.lat - b.lat; 
     const dy = a.lng - b.lng;
     return Math.sqrt(dx * dx + dy * dy);
   }
