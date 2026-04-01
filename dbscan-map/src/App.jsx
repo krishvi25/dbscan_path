@@ -182,16 +182,22 @@ console.log("DATA FROM DB:", data);
 
     })*/
     useEffect(() => {
- //fetch("http://localhost:5000/Points")
- fetch("https://dbscan-path.onrender.com/Points")
+  fetch("https://dbscan-path.onrender.com/Points")
     .then(res => res.json())
     .then(data => {
+      console.log("API DATA:", data[0]);
+
       const validPoints = data
         .filter(p => !isNaN(p.Latitude) && !isNaN(p.Longitude))
-        .map(p => ({ lat: Number(p.Latitude), lng: Number(p.Longitude),
-  cause: p.Cause || "Others" }));
-      console.log("POINTS LOADED:", validPoints.length);
-      setPoints(validPoints);
+        .map(p => ({
+          lat: Number(p.Latitude),
+          lng: Number(p.Longitude),
+          cause: p.Cause && p.Cause !== "nan" ? p.Cause : "Others"
+        }));
+
+      console.log("POINTS:", validPoints.length); // debug
+
+      setPoints(validPoints); // ✅ YOU FORGOT THIS
     })
     .catch(err => console.error("Fetch points error:", err));
 }, []);
