@@ -25,37 +25,36 @@ def get_points():
 
     points_cursor = points_collection.find({}, {"_id": 0})
 
-   valid_points = []
+    valid_points = []
 
-for p in points_cursor:
-    lat = p.get("Latitude")
-    lng = p.get("Longitude")
-    cause = p.get("Cause")
+    for p in points_cursor:
+        lat = p.get("Latitude")
+        lng = p.get("Longitude")
+        cause = p.get("Cause")
 
-    # skip invalid lat/lng
-    if lat is None or lng is None:
-        continue
+        # skip invalid lat/lng
+        if lat is None or lng is None:
+            continue
 
-    try:
-        lat = float(lat)
-        lng = float(lng)
-    except:
-        continue
+        try:
+            lat = float(lat)
+            lng = float(lng)
+        except:
+            continue
 
-    # remove NaN lat/lng
-    if str(lat) == "nan" or str(lng) == "nan":
-        continue
+        # remove NaN lat/lng
+        if str(lat) == "nan" or str(lng) == "nan":
+            continue
 
-    # 🔥 FIX CAUSE
-    if cause is None or str(cause) == "nan":
-        cause = "Others"
+        # fix cause
+        if cause is None or str(cause) == "nan":
+            cause = "Others"
 
-    valid_points.append({
-        "Latitude": lat,
-        "Longitude": lng,
-        "Cause": cause   # ✅ ALWAYS STRING NOW
-    })
-       
+        valid_points.append({
+            "Latitude": lat,
+            "Longitude": lng,
+            "Cause": cause
+        })
 
     print("Valid points:", len(valid_points))
 
