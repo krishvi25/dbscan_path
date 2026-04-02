@@ -201,6 +201,8 @@ console.log("DATA FROM DB:", data);
     })
     .catch(err => console.error("Fetch points error:", err));
 }, []);
+
+
 /*cluster cause*/ 
 function getClusterCauseStats(clusterPoints) {
   const freq = {};
