@@ -214,8 +214,23 @@ function getClusterCauseStats(clusterPoints) {
 
   const sorted = Object.entries(freq).sort((a, b) => b[1] - a[1]);
 
+  let topCause = "Unidentified Cause";
+
+  if (sorted.length > 0) {
+    if (sorted[0][0] !== "Others") {
+      // normal case
+      topCause = sorted[0][0];
+    } else if (sorted.length > 1) {
+      // skip "Others", take 2nd
+      topCause = sorted[1][0];
+    } else {
+      // only "Others" present
+      topCause = "Unidentified Cause";
+    }
+  }
+
   return {
-    top: sorted[0]?.[0] || "Others",
+    top: topCause,
     all: sorted
   };
 }
